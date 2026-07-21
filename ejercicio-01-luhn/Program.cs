@@ -2,9 +2,12 @@
 using System;
 using System.IO;
 
+using System;
+using System.IO;
+
 class Program
 {
-    // Variables globales para el módulo de Estadísticas
+    // Acumuladores globales para el reporte de estadísticas
     static int totalValidas = 0;
     static int totalInvalidas = 0;
     static int cantidadVisa = 0;
@@ -17,7 +20,7 @@ class Program
     {
         string opcion;
 
-        // Menú principal con ciclo do-while
+        // Bucle para mantener el menú activo hasta que el usuario elija salir
         do
         {
             Console.Clear();
@@ -60,6 +63,7 @@ class Program
             }
             catch (Exception ex)
             {
+                // Captura de errores generales para evitar que el programa se cierre
                 Console.WriteLine($"Ocurrió un error inesperado: {ex.Message}");
             }
 
@@ -72,7 +76,7 @@ class Program
         } while (opcion != "5");
     }
 
-    // REQUISITO 1: Algoritmo de Luhn (30%)
+    // Algoritmo de Luhn para validar el número de tarjeta
     public static bool ValidarTarjeta(string numero)
     {
         if (string.IsNullOrWhiteSpace(numero)) return false;
@@ -80,46 +84,49 @@ class Program
         int suma = 0;
         bool duplicar = false;
 
+        // Recorrido de derecha a izquierda (desde el último dígito)
         for (int i = numero.Length - 1; i >= 0; i--)
         {
-            if (!char.IsDigit(numero[i])) return false; // descarta caracteres no numéricos
+            if (!char.IsDigit(numero[i])) return false; // descarta si la cadena trae letras o símbolos
 
             int digito = (int)char.GetNumericValue(numero[i]);
 
+            // Se duplica uno sí y uno no
             if (duplicar)
             {
                 digito *= 2;
                 if (digito > 9)
                 {
-                    digito -= 9;
+                    digito -= 9; // Si supera 9, resta 9 para obtener la suma de sus dígitos
                 }
             }
 
             suma += digito;
-            duplicar = !duplicar;
+            duplicar = !duplicar; // Alterna la bandera para la siguiente iteración
         }
 
+        // Si la suma total es múltiplo de 10, la tarjeta es válida
         return (suma % 10 == 0);
     }
 
-    // REQUISITO 2: Identificación de Marcas (15%)
+    // Identifica la franquicia según el prefijo y la cantidad de dígitos
     public static string IdentificarMarca(string numero)
     {
         int longitud = numero.Length;
 
-        // Visa
+        // Visa: Empieza en 4 y tiene 13 o 16 dígitos
         if (numero.StartsWith("4") && (longitud == 13 || longitud == 16))
         {
             return "Visa";
         }
 
-        // American Express
+        // American Express: Empieza en 34 o 37 y tiene 15 dígitos
         if ((numero.StartsWith("34") || numero.StartsWith("37")) && longitud == 15)
         {
             return "American Express";
         }
 
-        // Mastercard
+        // Mastercard: 16 dígitos y prefijo entre 51 y 55
         if (longitud == 16)
         {
             int prefijo2 = int.Parse(numero.Substring(0, 2));
@@ -129,7 +136,7 @@ class Program
             }
         }
 
-        // Discover
+        // Discover: Rangos específicos y longitud de 16 a 19 dígitos
         if (longitud >= 16 && longitud <= 19)
         {
             if (numero.StartsWith("6011") || numero.StartsWith("65"))
@@ -153,7 +160,7 @@ class Program
         return "Desconocida";
     }
 
-    // REQUISITO 3: Validar desde archivo (10%)
+    // Lee un archivo de texto con un número de tarjeta por línea
     public static void ValidarDesdeArchivo(string ruta)
     {
         try
@@ -182,25 +189,24 @@ class Program
         }
     }
 
-    // REQUISITO 4: Generar número válido (10%)
+    // Genera una tarjeta de prueba válida encontrando el último dígito mediante Luhn
     public static string GenerarNumeroValido()
     {
-        Random random = new Random();
         string baseTarjeta = "453201511283036"; // Base fija tipo Visa (15 dígitos)
 
+        // Prueba del 0 al 9 en el último carácter hasta dar con la combinación válida
         for (int i = 0; i <= 9; i++)
         {
             string prueba = baseTarjeta + i;
             if (ValidarTarjeta(prueba))
             {
-                return prueba; // Retorna la combinación que hace que el dígito de verificación sea correcto
+                return prueba;
             }
         }
 
         return "4532015112830366";
     }
 
-    // Método auxiliar opción 1
     private static void ProcesarTarjetaIndividual()
     {
         Console.Write("Número: ");
@@ -208,7 +214,6 @@ class Program
         RegistrarYMostrarTarjeta(numero);
     }
 
-    // Método auxiliar opción 3
     private static void GenerarYMostrarTarjetaValida()
     {
         string nuevaTarjeta = GenerarNumeroValido();
@@ -216,13 +221,12 @@ class Program
         RegistrarYMostrarTarjeta(nuevaTarjeta);
     }
 
-    // Método auxiliar para imprimir resultado y acumular Estadísticas (10%)
+    // Muestra los datos de la tarjeta en consola e incrementa los contadores
     private static void RegistrarYMostrarTarjeta(string numero)
     {
         bool esValida = ValidarTarjeta(numero);
         string marca = IdentificarMarca(numero);
 
-        // Actualizar contadores
         if (esValida) totalValidas++;
         else totalInvalidas++;
 
@@ -235,13 +239,11 @@ class Program
             default: cantidadDesconocida++; break;
         }
 
-        // Formato de salida según el PDF
         Console.WriteLine($"\nNúmero: {numero}");
         Console.WriteLine($"Marca:  {marca}");
         Console.WriteLine($"Estado: {(esValida ? "✅ VÁLIDA" : "❌ INVÁLIDA")}");
     }
 
-    // REQUISITO 5: Estadísticas acumuladas
     private static void MostrarEstadisticas()
     {
         Console.WriteLine("=== ESTADÍSTICAS DEL SISTEMA ===");
@@ -257,4 +259,3 @@ class Program
         Console.WriteLine($" - Desconocida:      {cantidadDesconocida}");
     }
 }
-
