@@ -1,0 +1,23 @@
+[
+  {
+    "Id": 1,
+    "Titulo": "Revisar documentacion API",
+    "Descripcion": "Repasar endpoints y respuestas JSON",
+    "Prioridad": 1,
+    "Categoria": "Estudio",
+    "Completada": false,
+    "FechaCreacion": "2026-07-26T21:53:29.4115593-05:00",
+    "TipoTarea": "Simple"
+  },
+  {
+    "Id": 2,
+    "Titulo": "Entregar proyecto de POO",
+    "Descripcion": "Subir taller a la plataforma de la universidad",
+    "Prioridad": 3,
+    "Categoria": "Universidad",
+    "Completada": false,
+    "FechaCreacion": "2026-07-26T21:55:19.0251348-05:00",
+    "TipoTarea": "ConVencimiento",
+    "FechaVencimiento": "2026-08-15T00:00:00"
+  }
+]
